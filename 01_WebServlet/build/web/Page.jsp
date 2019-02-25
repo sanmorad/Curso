@@ -21,9 +21,11 @@
     <body>
         <h1>Bienvenido <%= nombre %></h1>
         <form name="form3" method="post" action="userOptions.do">
+            <input type="hidden" name="type" id="type" value="options"/>
             <input type="submit" name="boton" value="Salir"/>
             <input type="submit" name="boton" value="Modificar"/>
-            <input type="submit" name="boton" value="Eliminar"/>
+            <input type="submit" name="boton" value="Eliminar Cuenta"/>
+            <input type="submit" name="boton" value="Eliminar Usuario"/>
         </form>
     </body>
 </html>

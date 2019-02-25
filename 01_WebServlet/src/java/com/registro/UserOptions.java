@@ -33,35 +33,22 @@ create table "ROOT".USUARIOS
 */
 public class UserOptions extends HttpServlet {
 
-   
+   ServicioUsuarios servicio;
+    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-       String opcion = request.getParameter("boton");
-        ServicioUsuarios servicio = ServicioUsuarios.getInstancia();
-        HttpSession sesion = request.getSession();
-        Usuario u  = (Usuario)sesion.getAttribute("Usuario");
-       switch(opcion){
-           case "Modificar":
-               sesion.setAttribute("function", "Edit");
-               request.getRequestDispatcher("registro.jsp").forward(request, response);
+       servicio = ServicioUsuarios.getInstancia();
+       String type = request.getParameter("type");
+       switch(type){
+           case "options":
+               options(request, response);
                break;
-           case "Eliminar":
-               servicio.eliminarUser(u);
-               request.setAttribute("Mssg", "Usuario "+u.getNombre()+" eliminado");
-               sesion.removeAttribute("Usuario");
-               request.getRequestDispatcher("index.html").forward(request, response);
-               break;
-           case "Salir":
-                sesion.removeAttribute("Usuario");
-               request.getRequestDispatcher("index.html").forward(request, response);
-               break;
-           case "Eliminar otro Usuario":
-               sesion.setAttribute("function", "Delete");
-               request.getRequestDispatcher("registro.jsp").forward(request, response);
-               request.getRequestDispatcher("index.html").forward(request, response);
+           case "delete":
+               delete(request, response);
                break;
        }
+       
     }
 
     /**
@@ -74,4 +61,46 @@ public class UserOptions extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
+    private void options(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException{
+       String opcion = request.getParameter("boton");
+       
+       HttpSession sesion = request.getSession();
+       Usuario u  = (Usuario)sesion.getAttribute("Usuario");
+       switch(opcion){
+           case "Modificar":
+               sesion.setAttribute("function", "Edit");
+               request.getRequestDispatcher("registro.jsp").forward(request, response);
+               break;
+           case "Eliminar Cuenta":
+               servicio.eliminarUser(u.getId());
+               request.setAttribute("Mssg", "Usuario "+u.getNombre()+" eliminado");
+               sesion.removeAttribute("Usuario");
+               request.getRequestDispatcher("index.jsp").forward(request, response);
+               break;
+           case "Eliminar Usuario":
+               request.setAttribute("listaUsuarios", servicio.readAll(u.getId()));
+               request.getRequestDispatcher("eliminar.jsp").forward(request, response);
+               break;
+           case "Salir":
+                sesion.removeAttribute("Usuario");
+               request.getRequestDispatcher("index.jsp").forward(request, response);
+               break;
+           case "Eliminar otro Usuario":
+               sesion.setAttribute("function", "Delete");
+               request.getRequestDispatcher("registro.jsp").forward(request, response);
+               request.getRequestDispatcher("index.html").forward(request, response);
+               break;
+       }
+    }
+
+    private void delete(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException{
+        String id = request.getParameter("eleccion");
+        int nId = Integer.parseInt(id);
+        servicio.eliminarUser(nId);
+        
+    }
+
+    
 }

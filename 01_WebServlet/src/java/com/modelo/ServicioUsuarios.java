@@ -5,12 +5,15 @@
  */
 package com.modelo;
 
+import com.persistencia.JDB_DAO;
+import com.persistencia.Usuario_DAO;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.derby.jdbc.ClientDriver;
@@ -22,10 +25,11 @@ import org.apache.derby.jdbc.ClientDriver;
 public class ServicioUsuarios {
 
     private static ServicioUsuarios instancia;
-    private final ArrayList<Usuario> usuarios;
-
+    private Usuario_DAO persistencia;
+    
+    
     private ServicioUsuarios() {
-        this.usuarios = new ArrayList<Usuario>();
+        persistencia = JDB_DAO.getInstancia();
         try {
             Class.forName("org.apache.derby.jdbc.ClientDriver");
             DriverManager.registerDriver(new org.apache.derby.jdbc.EmbeddedDriver());
@@ -41,78 +45,23 @@ public class ServicioUsuarios {
     }
 
     public Usuario addUser(Usuario u) {
-        try (Connection conn = DriverManager.getConnection("jdbc:derby://localhost:1527/MyServerDB", "root", "root")) {
-            PreparedStatement st = conn.prepareStatement("INSERT INTO USUARIOS( NOMBRE, EDAD, EMAIL, PASS )  VALUES (? , ? , ? , ?) ");
-            st.setString(1, u.getNombre());
-            st.setInt(2, u.getEdad());
-            st.setString(3, u.getEmail());
-            st.setString(4, u.getPassword());
-            st.executeUpdate();
-            Usuario rUser = validacionPasswd(u.getEmail(), u.getPassword());
-            return rUser;
-        } catch (SQLException ex) {
-            System.err.println("Error");
-            ex.printStackTrace();
-            return null;
-        }
-
+        return persistencia.addUser(u);
     }
     
-    public boolean eliminarUser(Usuario u){
-         try (Connection conn = DriverManager.getConnection("jdbc:derby://localhost:1527/MyServerDB", "root", "root")) {
-            PreparedStatement st = conn.prepareStatement("DELETE FROM USUARIOS WHERE ID = ?");
-            st.setInt(1, u.getId());
-            st.executeUpdate();
-            return true;
-        } catch (SQLException ex) {
-            System.err.println("Error");
-            ex.printStackTrace();
-            return false;
-        }
+    public boolean eliminarUser(int id){
+          return persistencia.deleteUser(id);
     }
     
     public Usuario modificarUser(Usuario u){
-         try (Connection conn = DriverManager.getConnection("jdbc:derby://localhost:1527/MyServerDB", "root", "root")) {
-            PreparedStatement st = conn.prepareStatement(
-                    "UPDATE USUARIOS SET NOMBRE = ?, EDAD = ?, EMAIL = ?, PASS = ? WHERE ID = ?");
-            st.setString(1, u.getNombre());
-            st.setInt(2, u.getEdad());
-            st.setString(3, u.getEmail());
-            st.setString(4, u.getPassword());
-            st.setInt(5, u.getId());
-            st.executeUpdate();
-            return null;
-        } catch (SQLException ex) {
-            System.err.println("Error");
-            ex.printStackTrace();
-            return null;
-        }
+          return persistencia.modifyUser(u);
     }
 
-    public Usuario validacionPasswd(String rEmail, String rPasswd) {
-        try (Connection conn = DriverManager.
-                getConnection("jdbc:derby://localhost:1527/MyServerDB", "root", "root")) {
-            PreparedStatement st = conn.prepareStatement(
-                    "SELECT ID, NOMBRE, EDAD, EMAIL, PASS  FROM USUARIOS WHERE EMAIL = ? AND PASS = ?");
-            st.setString(1, rEmail);
-            st.setString(2, rPasswd);
-            ResultSet rs = st.executeQuery();
-            Usuario u = null;
-            if (rs.next()) {
-                    String nombre = rs.getString("NOMBRE");
-                    int edad = rs.getInt("EDAD");
-                    String email = rs.getString("EMAIL");
-                    String pass = rs.getString("PASS");
-                    u = new Usuario(nombre, edad, email, pass);
-                    Integer id = rs.getInt("ID");
-                    u.setId(id);
-            } 
-            return u;
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            return null;
-        }
+    public Usuario readUser(String rEmail, String rPasswd) {
+         return persistencia.readUser(rEmail,rPasswd);
     }
 
+    public List<Usuario> readAll(int localUser){
+        return persistencia.allUser(localUser);
+    }
    
 }

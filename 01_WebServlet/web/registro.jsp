@@ -7,10 +7,7 @@
 <%@page import="com.modelo.Usuario"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<% 
-    session.setAttribute("function", "Edit");
-               request.getRequestDispatcher("registro.jsp").forward(request, response);
-    
+<%     
     String[] fails = (String[]) request.getAttribute("fails");
     if(fails != null){
         for(String f : fails){

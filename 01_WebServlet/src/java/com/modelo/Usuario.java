@@ -24,6 +24,15 @@ public class Usuario {
         this.password = password;
     }
 
+    public Usuario(String nombre, int edad, String email, String password, int id) {
+        this.nombre = nombre;
+        this.edad = edad;
+        this.email = email;
+        this.password = password;
+        this.id = id;
+    }
+    
+
     /**
      * Get the value of edad
      *

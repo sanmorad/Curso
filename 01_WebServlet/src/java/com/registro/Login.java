@@ -42,7 +42,7 @@ public class Login extends HttpServlet {
                     String email = request.getParameter("email");
                     String pass = request.getParameter("psswd");
                     ServicioUsuarios service = ServicioUsuarios.getInstancia();
-                    Usuario u = service.validacionPasswd(email, pass);
+                    Usuario u = service.readUser(email, pass);
                     if(u != null){
                         HttpSession session = request.getSession();
                         session.setAttribute("Usuario", u);
@@ -66,4 +66,6 @@ public class Login extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
+    
+    
 }
